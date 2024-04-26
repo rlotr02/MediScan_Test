@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:mediscan/largebutton.dart';
 import 'package:mediscan/theme/colors.dart';
 import 'package:mediscan/uploadphoto.dart';
 
@@ -18,6 +20,8 @@ class MyAppState extends State<MyApp> {
   String frontMark = ''; //작성한 식별표시 앞
   String backMark = ''; //작성한 식별표시 뒤
   bool isWarning = false; //경고 색상 표시 여부
+  File? frontImage; //약 이미지 앞
+  File? backImage; //약 이미지 뒤
 
   void setSelectedShape(String shape) {
     setState(() {
@@ -46,41 +50,73 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'MediScan',
-          style:
-              TextStyle(color: mainColor, fontFamily: 'Inter900', fontSize: 24),
+      home: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 65,
+          title: const Text(
+            'MediScan',
+            style: TextStyle(
+                color: mainColor, fontFamily: 'Inter900', fontSize: 24),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+        body: Column(
           children: [
-            ShapeComponent(
-              selectedShape: selectedShape,
-              onShapeSelected: setSelectedShape,
-              isWarning: isWarning,
-              onWarningChanged: setWarning,
-            ),
-            MarkComponent(
-              frontMark: frontMark,
-              backMark: backMark,
-              onFrontMarkChanged: setFrontMark,
-              onBackMarkChanged: setBackMark,
-            ),
-            LargeButton(
-              buttonText: "알약 스캔하기",
-              selectedShape: selectedShape,
-              onWarningChanged: setWarning,
-              frontMark: frontMark,
-              backMark: backMark,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ShapeComponent(
+                      selectedShape: selectedShape,
+                      onShapeSelected: setSelectedShape,
+                      isWarning: isWarning,
+                      onWarningChanged: setWarning,
+                    ),
+                    MarkComponent(
+                      frontMark: frontMark,
+                      backMark: backMark,
+                      onFrontMarkChanged: setFrontMark,
+                      onBackMarkChanged: setBackMark,
+                    ),
+                  ],
+                ),
+              ),
             ),
             Text('$selectedShape $frontMark $backMark'),
+            Builder(
+              builder: (BuildContext context) {
+                return LargeButton(
+                  buttonText: "알약 스캔하기",
+                  selectedShape: selectedShape,
+                  frontMark: frontMark,
+                  backMark: backMark,
+                  frontImage: frontImage,
+                  backImage: backImage,
+                  onPressed: () {
+                    if (selectedShape == '') {
+                      setWarning(true);
+                    } else {
+                      ShapeData data = ShapeData(
+                        selectedShape: selectedShape,
+                        frontMark: frontMark,
+                        backMark: backMark,
+                        frontImage: frontImage,
+                        backImage: backImage,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UploadPage(shapeData: data),
+                        ),
+                      );
+                    }
+                  },
+                );
+              },
+            )
           ],
         ),
       ),
-    ));
+    );
   }
 }
 
@@ -293,83 +329,6 @@ class MarkState extends State<MarkComponent> {
         buildMark("식별표시 앞", frontController, widget.onFrontMarkChanged),
         buildMark("식별표시 뒤", backController, widget.onBackMarkChanged),
       ],
-    );
-  }
-}
-
-class ShapeData {
-  final String selectedShape; //선택한 알약 모양
-  final String frontMark; //작성한 식별표시 앞
-  final String backMark; //작성한 식별표시 뒤
-
-  ShapeData({
-    required this.selectedShape,
-    required this.frontMark,
-    required this.backMark,
-  });
-}
-
-class LargeButton extends StatefulWidget {
-  final String buttonText;
-  final String selectedShape;
-  final Function(bool) onWarningChanged;
-  final String frontMark;
-  final String backMark;
-
-  const LargeButton(
-      {super.key,
-      required this.buttonText,
-      required this.selectedShape,
-      required this.onWarningChanged,
-      required this.frontMark,
-      required this.backMark});
-
-  @override
-  LargeButtonState createState() => LargeButtonState();
-}
-
-class LargeButtonState extends State<LargeButton> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 38, right: 38, top: 100),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                if (widget.selectedShape == '') {
-                  widget.onWarningChanged(true);
-                } else {
-                  ShapeData data = ShapeData(
-                      selectedShape: widget.selectedShape,
-                      frontMark: widget.frontMark,
-                      backMark: widget.backMark);
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UploadPage(shapeData: data),
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: mainColor,
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                widget.buttonText,
-                style: const TextStyle(
-                    color: whiteColor, fontFamily: 'NotoSans500', fontSize: 14),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
