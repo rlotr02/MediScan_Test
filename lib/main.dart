@@ -1,0 +1,375 @@
+import 'package:flutter/material.dart';
+import 'package:mediscan/theme/colors.dart';
+import 'package:mediscan/uploadphoto.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  MyAppState createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
+  String selectedShape = ''; //선택한 알약 모양
+  String frontMark = ''; //작성한 식별표시 앞
+  String backMark = ''; //작성한 식별표시 뒤
+  bool isWarning = false; //경고 색상 표시 여부
+
+  void setSelectedShape(String shape) {
+    setState(() {
+      selectedShape = shape;
+    });
+  }
+
+  void setFrontMark(String mark) {
+    setState(() {
+      frontMark = mark;
+    });
+  }
+
+  void setBackMark(String mark) {
+    setState(() {
+      backMark = mark;
+    });
+  }
+
+  void setWarning(bool warning) {
+    setState(() {
+      isWarning = warning;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        home: Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'MediScan',
+          style:
+              TextStyle(color: mainColor, fontFamily: 'Inter900', fontSize: 24),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ShapeComponent(
+              selectedShape: selectedShape,
+              onShapeSelected: setSelectedShape,
+              isWarning: isWarning,
+              onWarningChanged: setWarning,
+            ),
+            MarkComponent(
+              frontMark: frontMark,
+              backMark: backMark,
+              onFrontMarkChanged: setFrontMark,
+              onBackMarkChanged: setBackMark,
+            ),
+            LargeButton(
+              buttonText: "알약 스캔하기",
+              selectedShape: selectedShape,
+              onWarningChanged: setWarning,
+              frontMark: frontMark,
+              backMark: backMark,
+            ),
+            Text('$selectedShape $frontMark $backMark'),
+          ],
+        ),
+      ),
+    ));
+  }
+}
+
+//알약 모양 선택
+class ShapeComponent extends StatefulWidget {
+  final String selectedShape;
+  final Function(String) onShapeSelected;
+  final bool isWarning;
+  final Function(bool) onWarningChanged;
+
+  const ShapeComponent(
+      {super.key,
+      required this.selectedShape,
+      required this.onShapeSelected,
+      required this.isWarning,
+      required this.onWarningChanged});
+
+  @override
+  ShapeState createState() => ShapeState();
+}
+
+class ShapeState extends State<ShapeComponent> {
+  final List<String> buttonTexts = [
+    '원형',
+    '타원형',
+    '삼각형',
+    '사각형',
+    '오각형',
+    '육각형',
+    '팔각형',
+    '다이아몬드',
+    '기타'
+  ]; //알약 종류
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10, left: 20, top: 16),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '(필수) 알약의 모양을 선택해주세요.',
+              style: TextStyle(
+                color: widget.isWarning ? redColor : deleteColor,
+                fontFamily: 'NotoSans500',
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        Divider(
+          color: widget.isWarning ? redColor : deleteColor,
+          thickness: 1,
+          height: 0,
+          indent: 0,
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 10,
+          runSpacing: 16,
+          alignment: WrapAlignment.center,
+          children: buttonTexts
+              .map(
+                (text) => OutlinedButton(
+                  onPressed: () {
+                    widget.onShapeSelected(text);
+                    if (widget.isWarning == true) {
+                      widget.onWarningChanged(false);
+                    }
+                  },
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    backgroundColor:
+                        widget.selectedShape == text ? backColor : whiteColor,
+                    side: const BorderSide(color: backColor),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 48),
+                    child: Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: widget.selectedShape == text
+                              ? whiteColor
+                              : blackColor,
+                          fontFamily: 'NotoSans500',
+                          fontSize: 14),
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+//알약 식별표시 작성
+class MarkComponent extends StatefulWidget {
+  final String frontMark;
+  final String backMark;
+  final Function(String) onFrontMarkChanged;
+  final Function(String) onBackMarkChanged;
+
+  const MarkComponent(
+      {super.key,
+      required this.frontMark,
+      required this.backMark,
+      required this.onFrontMarkChanged,
+      required this.onBackMarkChanged});
+
+  @override
+  MarkState createState() => MarkState();
+}
+
+class MarkState extends State<MarkComponent> {
+  final TextEditingController frontController = TextEditingController();
+  final TextEditingController backController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    frontController.text = widget.frontMark;
+    backController.text = widget.backMark;
+  }
+
+  @override
+  void dispose() {
+    frontController.dispose();
+    backController.dispose();
+    super.dispose();
+  }
+
+  Widget buildMark(String title, TextEditingController controller,
+      Function(String) onMarkChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 0, left: 12, right: 12, top: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8, bottom: 10),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'NotoSans500',
+                fontSize: 14,
+                color: backColor,
+              ),
+            ),
+          ),
+          TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: title,
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(100),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: inputColor,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              ),
+              style: const TextStyle(
+                fontFamily: 'NotoSans500',
+                fontSize: 14,
+                color: blackColor,
+              ),
+              onChanged: onMarkChanged),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 10, left: 20, top: 16),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '(권장) 알약의 식별표시를 입력해주세요.',
+              style: TextStyle(
+                color: backColor,
+                fontFamily: 'NotoSans500',
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ),
+        const Divider(
+          color: backColor,
+          thickness: 1,
+          height: 0,
+          indent: 0,
+        ),
+        buildMark("식별표시 앞", frontController, widget.onFrontMarkChanged),
+        buildMark("식별표시 뒤", backController, widget.onBackMarkChanged),
+      ],
+    );
+  }
+}
+
+class ShapeData {
+  final String selectedShape; //선택한 알약 모양
+  final String frontMark; //작성한 식별표시 앞
+  final String backMark; //작성한 식별표시 뒤
+
+  ShapeData({
+    required this.selectedShape,
+    required this.frontMark,
+    required this.backMark,
+  });
+}
+
+class LargeButton extends StatefulWidget {
+  final String buttonText;
+  final String selectedShape;
+  final Function(bool) onWarningChanged;
+  final String frontMark;
+  final String backMark;
+
+  const LargeButton(
+      {super.key,
+      required this.buttonText,
+      required this.selectedShape,
+      required this.onWarningChanged,
+      required this.frontMark,
+      required this.backMark});
+
+  @override
+  LargeButtonState createState() => LargeButtonState();
+}
+
+class LargeButtonState extends State<LargeButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, left: 38, right: 38, top: 100),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                if (widget.selectedShape == '') {
+                  widget.onWarningChanged(true);
+                } else {
+                  ShapeData data = ShapeData(
+                      selectedShape: widget.selectedShape,
+                      frontMark: widget.frontMark,
+                      backMark: widget.backMark);
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UploadPage(shapeData: data),
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: mainColor,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                widget.buttonText,
+                style: const TextStyle(
+                    color: whiteColor, fontFamily: 'NotoSans500', fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
