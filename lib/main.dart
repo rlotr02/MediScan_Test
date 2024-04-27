@@ -50,8 +50,11 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: whiteColor),
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: whiteColor,
+          scrolledUnderElevation: 0,
           toolbarHeight: 65,
           title: const Text(
             'MediScan',

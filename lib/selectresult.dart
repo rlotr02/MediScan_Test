@@ -1,8 +1,7 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mediscan/largebutton.dart';
+import 'package:mediscan/result.dart';
 import 'package:mediscan/theme/colors.dart';
 
 class SelectPage extends StatefulWidget {
@@ -34,6 +33,8 @@ class SelectPageState extends State<SelectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: whiteColor,
+        scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
         toolbarHeight: 65,
         title: const Text(
@@ -58,6 +59,11 @@ class SelectPageState extends State<SelectPage> {
                     onWarningChanged: setWarning,
                     selectedId: selectedId,
                     onIdSelected: setCapsule,
+                  ),
+                  ResultButton(
+                    selectedId: selectedId,
+                    isWarning: isWarning,
+                    onWarningChanged: setWarning,
                   )
                 ],
               ),
@@ -96,12 +102,7 @@ class PhotoState extends State<PhotoComponent> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: image == null
-                ? const Text(
-                    "이미지가 없습니다",
-                    style: TextStyle(
-                      backgroundColor: backColor,
-                    ),
-                  )
+                ? null
                 : Image.file(
                     image,
                     fit: BoxFit.cover,
@@ -194,14 +195,66 @@ class CapsuleSelect extends StatefulWidget {
   CapsuleSelectState createState() => CapsuleSelectState();
 }
 
+class ResultList {
+  final int id;
+  final int percent;
+  final File? image;
+  final String title;
+  final String description;
+
+  ResultList({
+    required this.id,
+    required this.percent,
+    this.image,
+    required this.title,
+    required this.description,
+  });
+}
+
 class CapsuleSelectState extends State<CapsuleSelect> {
-  final List<int> buttonTexts = [1, 2, 3, 4, 5]; //리스트
+  final List<ResultList> buttonTexts = [
+    ResultList(
+      id: 1,
+      percent: 67,
+      image: null,
+      title: '리피논정 80밀리그램 (아토르 어찌구)',
+      description: '전립선비대증약',
+    ),
+    ResultList(
+      id: 2,
+      percent: 67,
+      image: null,
+      title: '리피논정 80밀리그램 (아토르 어찌구)',
+      description: '전립선비대증약',
+    ),
+    ResultList(
+      id: 3,
+      percent: 67,
+      image: null,
+      title: '리피논정 80밀리그램',
+      description: '전립선비대증약',
+    ),
+    ResultList(
+      id: 4,
+      percent: 67,
+      image: null,
+      title: '리피논정 80밀리그램',
+      description: '전립선비대증약',
+    ),
+    ResultList(
+      id: 5,
+      percent: 67,
+      image: null,
+      title: '리피논정 80밀리그램 (아토르 어찌구)',
+      description: '전립선비대증약',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: buttonTexts.map(
-        (id) {
+        (data) {
           return Padding(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 16),
             child: Row(
@@ -209,31 +262,86 @@ class CapsuleSelectState extends State<CapsuleSelect> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
-                      widget.onIdSelected(id);
+                      widget.onIdSelected(data.id);
                       if (widget.isWarning == true) {
                         widget.onWarningChanged(false);
                       }
                     },
                     style: OutlinedButton.styleFrom(
+                      minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       backgroundColor: whiteColor,
+                      foregroundColor: whiteColor,
                       side: BorderSide(
-                          color:
-                              widget.selectedId == id ? mainColor : subColor),
+                          color: widget.selectedId == data.id
+                              ? mainColor
+                              : subColor),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6),
+                          horizontal: 27, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text(
-                      '알약 이름',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color:
-                              widget.selectedId == id ? whiteColor : blackColor,
-                          fontFamily: 'NotoSans500',
-                          fontSize: 14),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${data.percent}%',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              color: mainColor,
+                              fontFamily: 'Inter900',
+                              fontSize: 24),
+                        ),
+                        const SizedBox(
+                          width: 18,
+                        ),
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: data.image == null
+                                ? Container(
+                                    color: backColor,
+                                  )
+                                : Image.file(
+                                    data.image!,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 190,
+                              child: Text(
+                                data.title,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    color: blackColor,
+                                    fontFamily: 'NotoSans500',
+                                    fontSize: 14),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 190,
+                              child: Text(
+                                data.description,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    color: backColor,
+                                    fontFamily: 'NotoSans500',
+                                    fontSize: 12),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -242,6 +350,63 @@ class CapsuleSelectState extends State<CapsuleSelect> {
           );
         },
       ).toList(),
+    );
+  }
+}
+
+class ResultButton extends StatefulWidget {
+  final int selectedId;
+  final bool isWarning;
+  final Function(bool) onWarningChanged;
+
+  const ResultButton(
+      {super.key,
+      required this.selectedId,
+      required this.isWarning,
+      required this.onWarningChanged});
+
+  @override
+  ResultButtonState createState() => ResultButtonState();
+}
+
+class ResultButtonState extends State<ResultButton> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, left: 38, right: 38),
+      child: Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                if (widget.selectedId == 0) {
+                  widget.onWarningChanged(true);
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ResultPage(selectedId: widget.selectedId),
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: mainColor,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                '정보 확인하기',
+                style: TextStyle(
+                    color: whiteColor, fontFamily: 'NotoSans500', fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

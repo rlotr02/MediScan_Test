@@ -13,8 +13,8 @@ class ShapeData {
     required this.selectedShape,
     required this.frontMark,
     required this.backMark,
-    File? frontImage,
-    File? backImage,
+    this.frontImage,
+    this.backImage,
   });
 }
 
@@ -24,6 +24,8 @@ class LargeButton extends StatefulWidget {
   final String frontMark;
   final String backMark;
   final Function() onPressed;
+  final File? frontImage;
+  final File? backImage;
 
   const LargeButton(
       {super.key,
@@ -32,8 +34,8 @@ class LargeButton extends StatefulWidget {
       required this.frontMark,
       required this.backMark,
       required this.onPressed,
-      required frontImage,
-      required backImage});
+      required this.frontImage,
+      required this.backImage});
 
   @override
   LargeButtonState createState() => LargeButtonState();

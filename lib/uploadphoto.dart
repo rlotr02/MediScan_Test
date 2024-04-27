@@ -39,6 +39,8 @@ class UploadPageState extends State<UploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: whiteColor,
+        scrolledUnderElevation: 0,
         toolbarHeight: 65,
         title: const Text(
           'MediScan',
@@ -74,6 +76,7 @@ class UploadPageState extends State<UploadPage> {
               ),
             ),
           ),
+          Text('${widget.shapeData.frontImage}, ${widget.shapeData.backImage}'),
           Text(
               '${widget.shapeData.selectedShape}, ${widget.shapeData.frontMark}, ${widget.shapeData.backMark}'),
           Builder(
@@ -180,8 +183,9 @@ class PhotoUploadState extends State<PhotoUploadComponent> {
                         }
                     },
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: whiteColor,
                       backgroundColor: whiteColor,
+                      foregroundColor: whiteColor,
+                      surfaceTintColor: whiteColor,
                       side: const BorderSide(color: mainColor),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
