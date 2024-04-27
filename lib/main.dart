@@ -142,17 +142,17 @@ class ShapeComponent extends StatefulWidget {
 }
 
 class ShapeState extends State<ShapeComponent> {
-  final List<String> buttonTexts = [
-    '원형',
-    '타원형',
-    '삼각형',
-    '사각형',
-    '오각형',
-    '육각형',
-    '팔각형',
-    '다이아몬드',
-    '기타'
-  ]; //알약 종류
+  final Map<String, String> buttonTexts = {
+    '원형': 'circle',
+    '타원형': 'ellipse',
+    '삼각형': 'triangle',
+    '사각형': 'square',
+    '오각형': 'pentagon',
+    '육각형': 'hexagon',
+    '팔각형': 'octagon',
+    '다이아몬드': 'diamond',
+    '기타': 'etc'
+  }; //알약 종류
 
   @override
   Widget build(BuildContext context) {
@@ -183,11 +183,11 @@ class ShapeState extends State<ShapeComponent> {
           spacing: 10,
           runSpacing: 16,
           alignment: WrapAlignment.center,
-          children: buttonTexts
+          children: buttonTexts.entries
               .map(
-                (text) => OutlinedButton(
+                (entry) => OutlinedButton(
                   onPressed: () {
-                    widget.onShapeSelected(text);
+                    widget.onShapeSelected(entry.value);
                     if (widget.isWarning == true) {
                       widget.onWarningChanged(false);
                     }
@@ -195,8 +195,9 @@ class ShapeState extends State<ShapeComponent> {
                   style: OutlinedButton.styleFrom(
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    backgroundColor:
-                        widget.selectedShape == text ? backColor : whiteColor,
+                    backgroundColor: widget.selectedShape == entry.value
+                        ? backColor
+                        : whiteColor,
                     side: const BorderSide(color: backColor),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -207,10 +208,10 @@ class ShapeState extends State<ShapeComponent> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minWidth: 48),
                     child: Text(
-                      text,
+                      entry.key,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: widget.selectedShape == text
+                          color: widget.selectedShape == entry.value
                               ? whiteColor
                               : blackColor,
                           fontFamily: 'NotoSans500',
