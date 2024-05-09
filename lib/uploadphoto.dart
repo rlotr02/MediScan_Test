@@ -41,21 +41,12 @@ class UploadPageState extends State<UploadPage> {
       appBar: AppBar(
         backgroundColor: whiteColor,
         scrolledUnderElevation: 0,
+        automaticallyImplyLeading: false,
         toolbarHeight: 65,
         title: const Text(
           'MediScan',
           style:
               TextStyle(color: mainColor, fontFamily: 'Inter900', fontSize: 24),
-        ),
-        leading: IconButton(
-          icon: Image.asset(
-            'assets/images/back.png',
-            width: 9,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          highlightColor: Colors.transparent,
         ),
       ),
       body: Column(
@@ -64,6 +55,19 @@ class UploadPageState extends State<UploadPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: Image.asset(
+                        'assets/images/back.png',
+                        width: 9,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      highlightColor: Colors.transparent,
+                    ),
+                  ),
                   PhotoUploadComponent(
                     isWarning: isWarning,
                     onWarningChanged: setWarning,
